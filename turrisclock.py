@@ -47,6 +47,12 @@ if __name__ == "__main__":
             if nowstate == clock.state:
                 time.sleep(1 - now%1) #wait for the end of current second
             else:
+                # In case clock is too fast, it's wise to wait a bit
+                if clock.stepstogo(nowstate) > 40000:
+                    towait = clock.timetowait(nowstate) 
+                    if clock.timetogo(nowstate) > towait:
+                        # waiting for the time, with comfort step every 10 seconds
+                        time.sleep(10 - now%10 if towait > 10 else towait)
                 clock.step()
     finally:
         statestore.save()

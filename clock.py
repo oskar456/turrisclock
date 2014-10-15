@@ -8,8 +8,8 @@ import re
 class Clock:
     """ Class representing clock state """
 
-    ontime = 0.03   # 30ms pulse width
-    offtime = 0.022  # minimum off time after pulse
+    ontime = 0.032   # on pulse width
+    offtime = 0.023  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
@@ -72,6 +72,34 @@ class Clock:
         """ Sets clock state from input string """
         self.state = Clock.parsestate(statestr)
 
+    @property
+    def stepduration(self):
+        return self.ontime + self.offtime
+
+    def stepstogo(self, desiredstate):
+        """ Calculates number of steps needed to reach desired state """
+        # Add 43200 to left side to avoid negative numbers when wrapping over
+        return ((43200+desiredstate) - self.state) % 43200
+        
+    def timetogo(self, desiredstate):
+        """ Calculates approx. time needed to reach desired state """
+        return self.stepduration * self.stepstogo(desiredstate)
+
+    def timetowait(self, desiredstate, comfortsteps=10):
+        """ 
+        Calculates approx. time to wait until desired state becomes current state.
+        A step every comfortsteps seconds can be added to calm down the user
+        """
+        timetowait = ((43200+self.state) - desiredstate) % 43200
+        if comfortsteps > 1:
+            stepstoadd = timetowait // comfortsteps
+            while stepstoadd > comfortsteps:
+                timetowait += stepstoadd
+                stepstoadd = stepstoadd // comfortsteps
+            timetowait += stepstoadd
+        return timetowait
+
+
     def __str__(self):
         return "Clock <{}> Inversed: {}".format(self.getState(), self.inverse)
 
@@ -84,4 +112,7 @@ if __name__ == "__main__":
     print clock
     clock.setState("13:23:4")
     print clock.getState()
+    newstate = Clock.parsestate("12:43:04")
+    print "Time to go: ", clock.timetogo(newstate)
+    print "Time to wait: ", clock.timetowait(newstate)
     print repr(clock)
