@@ -8,8 +8,8 @@ import re
 class Clock:
     """ Class representing clock state """
 
-    ontime = 0.032   # on pulse width
-    offtime = 0.023  # minimum off time after pulse
+    ontime = 0.03  # on pulse width
+    offtime = 0.03  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
@@ -92,11 +92,10 @@ class Clock:
         """
         timetowait = ((43200+self.state) - desiredstate) % 43200
         if comfortsteps > 1:
-            stepstoadd = timetowait // comfortsteps
-            while stepstoadd > comfortsteps:
-                timetowait += stepstoadd
-                stepstoadd = stepstoadd // comfortsteps
-            timetowait += stepstoadd
+            # This is actually a sum of infinite geometric series
+            # with a1=timetowait and q=1/comfortsteps
+            # Sum is therefore a1/(1-q)
+            timetowait = timetowait*comfortsteps/(comfortsteps-1)
         return timetowait
 
 
