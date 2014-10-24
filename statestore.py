@@ -6,7 +6,7 @@ import re
 
 class StateStore:
     """ Store for save and restore clock state """
-    def __init__(self, clock, filename="/root/clockstate.txt"):
+    def __init__(self, clock, filename="./clockstate.txt"):
         self.clock = clock
         self.filename = filename
     

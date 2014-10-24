@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 
-from gpio import GPIO
+from mspgpio import GPIO
 from clock import Clock
 from statestore import StateStore
 import signal
