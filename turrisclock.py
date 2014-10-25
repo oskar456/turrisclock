@@ -15,11 +15,18 @@ if __name__ == "__main__":
 
     import argparse
 
+    def pos_int(value):
+        ivalue = int(value)
+        if ivalue <= 0:
+            raise argparse.ArgumentTypeError("{} is an invalid positive int value".format(value))
+        return ivalue
+
     parser = argparse.ArgumentParser(description='TurrisClock')
     parser.add_argument("--invert", action='store_true')
     parser.add_argument("--uninvert", action='store_true')
     parser.add_argument("--state", help='hh:mm:ss')
-    parser.add_argument("--comfortstep", "-c", help='Comfort step interval when waiting', default=10, type=int, choices=xrange(0, 3600))
+    parser.add_argument("--step", "-s", help='step interval', default=1, type=pos_int)
+    parser.add_argument("--comfortstep", "-c", help='comfort step interval when waiting', default=10, type=pos_int)
     args = parser.parse_args()
 
 
@@ -45,16 +52,17 @@ if __name__ == "__main__":
             now = time.time()
             nows = time.localtime(now)
             nowstate = Clock.hourstostate(nows.tm_hour, nows.tm_min, nows.tm_sec)
-            if nowstate == clock.state:
-                time.sleep(1 - now%1) #wait for the end of current second
+            if nowstate//args.step == clock.state//args.step:
+                time.sleep(args.step - now%args.step) #wait for the end of current second
             else:
                 # In case clock is too fast, it's wise to wait a bit
-                if clock.stepstogo(nowstate) > 40000:
-                    towait = clock.timetowait(nowstate, args.comfortstep)
-                    if clock.timetogo(nowstate) > towait:
-                        # waiting for the time, with comfort step every 10 seconds
-                        time.sleep(args.comfortstep - now%args.comfortstep \
-                                   if towait > args.comfortstep else towait + 1 - now%1)
+                towait = clock.timetowait(nowstate, args.comfortstep) \
+                         + args.step - now%args.step
+                if clock.timetogo(nowstate) > towait:
+                    # waiting for the time, with comfort step every few seconds
+                    time.sleep(args.comfortstep - now%args.comfortstep \
+                               if towait > args.comfortstep > 1 \
+                               else towait)
                 clock.step()
     finally:
         statestore.save()
