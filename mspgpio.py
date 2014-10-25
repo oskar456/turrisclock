@@ -1,7 +1,36 @@
 #!/usr/bin/env python2.7
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 
-import time
+
+class MSP430:
+    """Interfacing with MSP430 via /dev/ttyACM0"""
+
+    def __init__(self):
+        self.state = 0
+        self.acm = open("/dev/ttyACM0", 'wb', 0)
+        self._update()
+
+    def __del__(self):
+        self.acm.close()
+
+    def _update(self):
+        self.acm.write("{:01x}".format(self.state))
+
+    def set(self, gpioid, value):
+        """ Set GPIO with given ID (bit weight) to given value """
+        if value:
+            self.state |= gpioid
+            self.state %= 4
+        else:
+            self.state &= ~gpioid
+            self.state %= 4
+        if gpioid == 1:
+            self._update()
+
+
+msp = MSP430()
+
+
 class GPIO:
     """ Class representing one GPIO signal """
 
@@ -11,9 +40,7 @@ class GPIO:
         @direction string in or out
         """
         self.name = str(name)
-        self.onstring =  'A' if self.name == '224' else 'B'
-        self.offstring = 'a' if self.name == '224' else 'b'
-        self.path = "/dev/ttyACM0"
+        self.msp = msp
         self.reset()
         self.setDirection(direction)
 
@@ -31,10 +58,7 @@ class GPIO:
 
     def set(self, value=True):
         """Sets GPIO to value"""
-        with open(self.path, 'w') as f:
-            f.write(self.onstring if value else self.offstring)
-        time.sleep(0.009)
-
+        self.msp.set(1 if self.name=="224" else 2, value)
 
     def reset(self):
         """Sets GPIO to value 0"""
