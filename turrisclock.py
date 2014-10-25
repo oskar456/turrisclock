@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--invert", action='store_true')
     parser.add_argument("--uninvert", action='store_true')
     parser.add_argument("--state", help='hh:mm:ss')
+    parser.add_argument("--comfortstep", "-c", help='Comfort step interval when waiting', default=10, type=int, choices=xrange(0, 3600))
     args = parser.parse_args()
 
 
@@ -49,10 +50,11 @@ if __name__ == "__main__":
             else:
                 # In case clock is too fast, it's wise to wait a bit
                 if clock.stepstogo(nowstate) > 40000:
-                    towait = clock.timetowait(nowstate) 
+                    towait = clock.timetowait(nowstate, args.comfortstep)
                     if clock.timetogo(nowstate) > towait:
                         # waiting for the time, with comfort step every 10 seconds
-                        time.sleep(10 - now%10 if towait > 10 else towait)
+                        time.sleep(args.comfortstep - now%args.comfortstep \
+                                   if towait > args.comfortstep else towait + 1 - now%1)
                 clock.step()
     finally:
         statestore.save()
