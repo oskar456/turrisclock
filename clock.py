@@ -8,8 +8,8 @@ import re
 class Clock:
     """ Class representing clock state """
 
-    ontime = 0.03  # on pulse width
-    offtime = 0.03  # minimum off time after pulse
+    ontime = 0.030   # on pulse width
+    offtime = 0.025  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
