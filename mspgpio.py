@@ -58,7 +58,7 @@ class GPIO:
 
     def set(self, value=True):
         """Sets GPIO to value"""
-        self.msp.set(1 if self.name=="224" else 2, value)
+        self.msp.set(1 if self.name=="225" else 2, value)
 
     def reset(self):
         """Sets GPIO to value 0"""
