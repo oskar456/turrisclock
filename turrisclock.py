@@ -52,17 +52,14 @@ if __name__ == "__main__":
             now = time.time()
             nows = time.localtime(now)
             nowstate = Clock.hourstostate(nows.tm_hour, nows.tm_min, nows.tm_sec)
-            if nowstate//args.step == clock.state//args.step:
-                time.sleep(args.step - now%args.step) #wait for the end of current second
-            else:
-                # In case clock is too fast, it's wise to wait a bit
-                towait = clock.timetowait(nowstate, args.comfortstep) \
-                         + args.step - now%args.step
-                if clock.timetogo(nowstate) > towait:
-                    # waiting for the time, with comfort step every few seconds
-                    time.sleep(args.comfortstep - now%args.comfortstep \
-                               if towait > args.comfortstep > 1 \
-                               else towait)
-                clock.step()
+            # In case clock is too fast, it's wise to wait a bit
+            towait = clock.timetowait(nowstate, args.comfortstep) \
+                     + args.step - now%args.step
+            if clock.timetogo(nowstate) > towait:
+                # waiting for the time, with comfort step every few seconds
+                time.sleep(args.comfortstep - now%args.comfortstep \
+                           if towait > args.comfortstep > 1 \
+                           else towait)
+            clock.step()
     finally:
         statestore.save()

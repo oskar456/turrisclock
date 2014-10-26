@@ -8,8 +8,8 @@ import re
 class Clock:
     """ Class representing clock state """
 
-    ontime = 0.03   # on pulse width
-    offtime = 0.025 # minimum off time after pulse
+    ontime = 0.035   # on pulse width
+    offtime = 0.035  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
@@ -79,11 +79,15 @@ class Clock:
     def stepstogo(self, desiredstate):
         """ Calculates number of steps needed to reach desired state """
         # Add 43200 to left side to avoid negative numbers when wrapping over
-        return ((43200+desiredstate) - self.state) % 43200
-        
+        steps = ((43200+desiredstate) - self.state) % 43200
+        # In case desired state == current state, return full scale instead of 0
+        return 43200 if steps==0 else steps
+
     def timetogo(self, desiredstate):
         """ Calculates approx. time needed to reach desired state """
-        return self.stepduration * self.stepstogo(desiredstate)
+        # Sum of infinite geometric series with a1 = stepstogo*stepduration
+        # and q = stepduration
+        return self.stepduration * self.stepstogo(desiredstate)/(1-self.stepduration)
 
     def timetowait(self, desiredstate, comfortsteps=10):
         """ 
