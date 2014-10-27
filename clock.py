@@ -16,8 +16,9 @@ class Clock:
     @staticmethod
     def statetohours(state):
         """ Converts clock state to a tuple (hour, min, secs) """
-        hours = state / 3600
-        mins  = (state % 3600) / 60
+        state = int(state)
+        hours = state // 3600
+        mins  = (state % 3600) // 60
         secs  = state % 60
         return (hours, mins, secs)
 
@@ -79,18 +80,20 @@ class Clock:
     def stepstogo(self, desiredstate):
         """ Calculates number of steps needed to reach desired state """
         # Add 43200 to left side to avoid negative numbers when wrapping over
-        return ((43200+desiredstate) - self.state) % 43200
-        
+        steps = ((43200+desiredstate) - self.state) % 43200
+        # In case desired state == current state, return full scale instead of 0
+        return 43200 if steps<1 else steps
+
     def timetogo(self, desiredstate):
         """ Calculates approx. time needed to reach desired state """
         return self.stepduration * self.stepstogo(desiredstate)
 
     def timetowait(self, desiredstate, comfortsteps=10):
-        """ 
+        """
         Calculates approx. time to wait until desired state becomes current state.
         A step every comfortsteps seconds can be added to calm down the user
         """
-        timetowait = ((43200+self.state) - desiredstate) % 43200
+        timetowait = ((43200+self.state) - int(desiredstate)) % 43200
         if comfortsteps > 1:
             # This is actually a sum of infinite geometric series
             # with a1=timetowait and q=1/comfortsteps

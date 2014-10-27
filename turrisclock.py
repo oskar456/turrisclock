@@ -55,14 +55,12 @@ if __name__ == "__main__":
         while True:
             now = time.time()
             nows = time.localtime(now)
-            nowstate = Clock.hourstostate(nows.tm_hour, nows.tm_min, nows.tm_sec)
-            nowstate -= nowstate%args.step
-            # In case clock is too fast, it's wise to wait a bit
+            nowstate = Clock.hourstostate(nows.tm_hour, nows.tm_min, nows.tm_sec) + now%1
             towait = clock.timetowait(nowstate, args.comfortstep) \
-                     + args.step - now%args.step
+                     + args.step - nowstate%args.step
             if clock.timetogo(nowstate) > towait:
                 # waiting for the time, with comfort step every few seconds
-                time.sleep(args.comfortstep - now%args.comfortstep \
+                time.sleep(args.comfortstep - nowstate%args.comfortstep \
                            if towait > args.comfortstep > 1 \
                            else towait)
             clock.step()
