@@ -56,13 +56,17 @@ if __name__ == "__main__":
             now = time.time()
             nows = time.localtime(now)
             nowstate = Clock.hourstostate(nows.tm_hour, nows.tm_min, nows.tm_sec) + now%1
-            towait = clock.timetowait(nowstate, args.comfortstep) \
-                     + args.step - nowstate%args.step
-            if clock.timetogo(nowstate) > towait:
-                # waiting for the time, with comfort step every few seconds
-                time.sleep(args.comfortstep - nowstate%args.comfortstep \
-                           if towait > args.comfortstep > 1 \
-                           else towait)
-            clock.step()
+
+            if nowstate//args.step == clock.state//args.step:
+                time.sleep(args.step - nowstate%args.step)
+            else:
+                towait = clock.timetowait(nowstate, args.comfortstep) \
+                         + args.step - nowstate%args.step
+                if clock.timetogo(nowstate) > towait:
+                    # waiting for the time, with comfort step every few seconds
+                    time.sleep(args.comfortstep - nowstate%args.comfortstep \
+                               if towait > args.comfortstep > 1 \
+                               else towait)
+                clock.step()
     finally:
         statestore.save()
