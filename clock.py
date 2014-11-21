@@ -8,8 +8,8 @@ import re
 class Clock:
     """ Class representing clock state """
 
-    ontime = 0.030   # on pulse width
-    offtime = 0.025  # minimum off time after pulse
+    ontime = 0.038   # on pulse width
+    offtime = 0.018  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
@@ -18,6 +18,7 @@ class Clock:
         """ Converts clock state to a tuple (hour, min, secs) """
         state = int(state)
         hours = state // 3600
+        hours = 12 if hours==0 else hours
         mins  = (state % 3600) // 60
         secs  = state % 60
         return (hours, mins, secs)
@@ -86,7 +87,9 @@ class Clock:
 
     def timetogo(self, desiredstate):
         """ Calculates approx. time needed to reach desired state """
-        return self.stepduration * self.stepstogo(desiredstate)
+        # Sum of infinite geometric series with a1 = stepstogo*stepduration
+        # and q = stepduration
+        return self.stepduration * self.stepstogo(desiredstate)/(1-self.stepduration)
 
     def timetowait(self, desiredstate, comfortsteps=10):
         """
