@@ -4,7 +4,7 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Turrisclock : Driving clock movement from Turris Router">
+    <meta name="description" content="Turrisclock : Driving clock movement from the Turris router">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -19,7 +19,7 @@
           <a id="forkme_banner" href="https://github.com/oskar456/turrisclock">View on GitHub</a>
 
           <h1 id="project_title">Turrisclock</h1>
-          <h2 id="project_tagline">Driving clock movement from Turris Router</h2>
+          <h2 id="project_tagline">Driving clock movement from the Turris router</h2>
 
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/oskar456/turrisclock/zipball/master">Download this project as a .zip file</a>
@@ -31,14 +31,81 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>This is a hardware and software design allowing you to connect common quartz analog clock movement to Turris router and let it controlled by <a href="https://www.turris.cz">Turris router</a>. Such clock features some ultimate features:</p>
+        <p>This is a hardware and software design allowing you to connect common quartz analog clock movement to a <a href="https://www.turris.cz">Turris router</a> and let it be controlled by it. Such clock has some ultimate features:</p>
 
 <ul>
 <li>precise atomic time thanks to NTP</li>
 <li>ability to pause and resume movement at any moment (no more ticking disturbing your sleep)</li>
 <li>battery-free operation</li>
-<li>special effect like stepping 5 seconds at time</li>
+<li>special effects like stepping 5 seconds at time</li>
 </ul>
+
+<h2>
+<a id="hardware" class="anchor" href="#hardware" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hardware</h2>
+
+<p>Carefully disassemble the clock machine. Hook up two wires directly to the <a href="http://en.wikipedia.org/wiki/Lavet_type_stepping_motor">Lavet type stepping motor</a> winding. You can take out the original circuitry or let it in place. In the latter case, make sure you disconnect at least one wire of the winding from the original circuitry.</p>
+
+<h2>
+<a id="hardware-interface" class="anchor" href="#hardware-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hardware interface</h2>
+
+<p><img src="https://raw.githubusercontent.com/oskar456/turrisclock/eagle/schematics.png" alt="Interface schematics"></p>
+
+<p>Design files for the interface are available in the <a href="https://github.com/oskar456/turrisclock/tree/eagle">eagle branch</a>. It has been made using <a href="http://www.cadsoftusa.com/eagle-pcb-design-software/product-overview/?language=en">EAGLE 7.2.0</a>. The interface connect the clock motor to GPIO connector (<a href="https://www.turris.cz/doc/_media/turris_pinout-v1_2.pdf">P3 on the Turris board</a>) via 10-wire flat ribbon cable.</p>
+
+<h2>
+<a id="software" class="anchor" href="#software" aria-hidden="true"><span class="octicon octicon-link"></span></a>Software</h2>
+
+<p>Software is written in Python 2. Since there is no feedback about current state of the clock face, the user have to provide current state when running the clock for the first time:</p>
+
+<pre><code>./turrisclock.py --state 12:34:56
+</code></pre>
+
+<p>After regular shutdown of the control software, the state of the clock is written to <code>/root/clockstate.txt</code>, from which it is reloaded on next start.</p>
+
+<h3>
+<a id="adjust-polarity" class="anchor" href="#adjust-polarity" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adjust polarity</h3>
+
+<p>Since Lavet motor requires polarized control pulses, there may be a situation when the clock appears one second slow. In that case, the polarity of control pulses has to be inverted. It can be done in hardware by exchanging the wires connecting the Lavet motor, or it can be done by using switch <code>--invert</code>. Information about polarity inversion is also stored with the clock state.</p>
+
+<h3>
+<a id="goto-utility" class="anchor" href="#goto-utility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goto utility</h3>
+
+<p>In order to set the clock to some arbitrary state, a simple utility can be used:</p>
+
+<pre><code>./goto.py 12:00:00
+</code></pre>
+
+<h3>
+<a id="stepping-more-seconds-at-time" class="anchor" href="#stepping-more-seconds-at-time" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stepping more seconds at time</h3>
+
+<p>You can make the clock go n-seconds at time by using switch <code>-s &lt;n&gt;</code></p>
+
+<h3>
+<a id="waiting-with-comfort-steps" class="anchor" href="#waiting-with-comfort-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Waiting with comfort steps</h3>
+
+<p>When the clock state is just a few minutes ahead of current time, it's usually not feasible to go fast forward all around the clock. Doing so would take much more time than just waiting until current time reaches the clock state. The software therefore computes what approach is better and act accordingly. To appease users during waiting, a comfort step is inserted every 10 seconds (configurable with <code>-c</code> command line argument).</p>
+
+<h2>
+<a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known issues</h2>
+
+<h3>
+<a id="clock-losing-steps-especially-during-fast-forward-movement" class="anchor" href="#clock-losing-steps-especially-during-fast-forward-movement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Clock losing steps, especially during fast-forward movement</h3>
+
+<ul>
+<li>problem is usually in poor quality of the clockwork, eg. unbalanced hands, big backlash, etc.</li>
+<li>you can try adjusting time constants <code>ontime</code> and <code>offtime</code> <a href="https://github.com/oskar456/turrisclock/blob/master/clock.py#L11">in `clock.py'</a>
+</li>
+</ul>
+
+<h3>
+<a id="clock-state-is-lost-when-the-router-loses-power" class="anchor" href="#clock-state-is-lost-when-the-router-loses-power" aria-hidden="true"><span class="octicon octicon-link"></span></a>Clock state is lost when the router loses power</h3>
+
+<p>This could be solved by saving the clock state after every step into the SRAM of battery-backed RTC chip inside Turris. However, there is no driver support for this RAM yet.</p>
+
+<h3>
+<a id="running-two-instances-of-the-software-results-is-strange-behaviour" class="anchor" href="#running-two-instances-of-the-software-results-is-strange-behaviour" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running two instances of the software results is strange behaviour</h3>
+
+<p>Locking is not implemented yet. Patches are welcome!</p>
       </section>
     </div>
 
