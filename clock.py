@@ -9,7 +9,7 @@ class Clock:
     """ Class representing clock state """
 
     ontime = 0.038   # on pulse width
-    offtime = 0.018  # minimum off time after pulse
+    offtime = 0.022  # minimum off time after pulse
     state = 0       # current state of the movement (0..43199)
     inverse = False # inversed polarity signal
 
