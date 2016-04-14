@@ -27,8 +27,8 @@ def argument_parser(description='TurrisClock'):
     return parser
 
 def clockinit(args):
-    POL = GPIO("224", "out")
-    CLK = GPIO("225", "out")
+    POL = GPIO("480", "out")
+    CLK = GPIO("481", "out")
     clock = Clock(CLK, POL)
     statestore = StateStore(clock)
     statestore.restore()
