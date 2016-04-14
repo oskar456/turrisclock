@@ -4,6 +4,7 @@
 from gpio import GPIO
 from clock import Clock
 from statestore import StateStore
+from nvramstore import NVRAMStore
 import signal
 import time
 import argparse
@@ -32,13 +33,15 @@ def clockinit(args):
     clock = Clock(CLK, POL)
     statestore = StateStore(clock)
     statestore.restore()
+    nvramstore = NVRAMStore(clock)
+    nvramstore.restore()
     if args.invert:
         clock.inverse = True
     if args.uninvert:
         clock.inverse = False
     if args.state:
         clock.setState(args.state)
-    return (clock, statestore)
+    return (clock, statestore, nvramstore)
 
 if __name__ == "__main__":
 
@@ -49,7 +52,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.step > args.comfortstep:
         args.comfortstep = args.step
-    clock, statestore = clockinit(args)
+    clock, statestore, nvramstore = clockinit(args)
+
+    def usr1handler(signum, frame):
+        clock.state -= 2
+
+    signal.signal(signal.SIGUSR1, usr1handler)
 
     try:
         while True:
@@ -68,5 +76,6 @@ if __name__ == "__main__":
                                if towait > args.comfortstep > 1 \
                                else towait)
                 clock.step()
+                nvramstore.save()
     finally:
         statestore.save()

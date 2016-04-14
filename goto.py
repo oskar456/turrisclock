@@ -9,11 +9,12 @@ if __name__ == "__main__":
     parser = argument_parser(description='TurrisClock goto')
     parser.add_argument("destination", help='hh:mm:ss to reach')
     args = parser.parse_args()
-    clock, statestore = clockinit(args)
+    clock, statestore, nvramstore = clockinit(args)
     deststate = Clock.parsestate(args.destination)
 
     try:
         while clock.state != deststate:
             clock.step()
+            nvramstore.save()
     finally:
         statestore.save()
