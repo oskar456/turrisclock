@@ -23,10 +23,14 @@ class NVRAMStore:
 
     def restore(self):
         """ Restores current state from file """
-        try:   
+        try:
             with open(self.filename, 'rb') as f:
                 out = self.fmt.unpack(f.read(self.fmt.size))
             if out[0] == self.MAGIC:
                 self.clock.state = out[1]
+                return True
+            else:
+                print "Clock state restore failed: invalid magic"
         except:
             print "Clock state restore failed:", sys.exc_info()[1]
+        return False

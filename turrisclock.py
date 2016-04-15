@@ -8,6 +8,7 @@ from nvramstore import NVRAMStore
 import signal
 import time
 import argparse
+import sys
 
 def killhandler(signum, frame):
     raise RuntimeError("Killed")
@@ -25,6 +26,7 @@ def argument_parser(description='TurrisClock'):
     parser.add_argument("--invert", action='store_true')
     parser.add_argument("--uninvert", action='store_true')
     parser.add_argument("--state", help='hh:mm:ss')
+    parser.add_argument("--require-nvram", action='store_true')
     return parser
 
 def clockinit(args):
@@ -34,7 +36,9 @@ def clockinit(args):
     statestore = StateStore(clock)
     statestore.restore()
     nvramstore = NVRAMStore(clock)
-    nvramstore.restore()
+    if args.require_nvram and not nvramstore.restore():
+        print "Cannot read clock state from the NVRAM. Exiting..."
+        sys.exit(1)
     if args.invert:
         clock.inverse = True
     if args.uninvert:
