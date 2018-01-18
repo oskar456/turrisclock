@@ -11,7 +11,7 @@ class NVRAMStore:
     MAGIC = "TRSCLK"
     fmt = struct.Struct("6sH")  # 6 byte magic plus one unsigned short
 
-    def __init__(self, clock, filename="/sys/devices/soc@ffe00000/"
+    def __init__(self, clock, filename="/sys/devices/platform/soc@ffe00000/"
                  "ffe03000.i2c/i2c-0/0-006f/nvram"):
         self.clock = clock
         self.filename = filename
