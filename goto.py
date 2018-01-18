@@ -4,8 +4,6 @@
 from turrisclock import Clock, argument_parser, clockinit
 
 if __name__ == "__main__":
-
-
     parser = argument_parser(description='TurrisClock goto')
     parser.add_argument("destination", help='hh:mm:ss to reach')
     args = parser.parse_args()

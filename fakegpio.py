@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+
 class GPIO:
     """ Class representing one fake GPIO signal for debugging purposes """
 
@@ -19,7 +20,6 @@ class GPIO:
     def __del__(self):
         """ Make sure direction is set to in to protect the SoC """
         self.setDirection("in")
-
 
     def setDirection(self, direction):
         """Sets pin direction"""

@@ -4,6 +4,7 @@
 import turris_gpio as gpio
 gpio.setmode(gpio.SOC)
 
+
 class GPIO:
     """ Class representing one GPIO signal """
 
@@ -40,4 +41,3 @@ class GPIO:
 
     def __repr__(self):
         return "GPIO({}, {})".format(self.name, self.direction)
-

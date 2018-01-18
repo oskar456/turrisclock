@@ -5,6 +5,7 @@ from __future__ import print_function
 import sys
 import re
 
+
 class StateStore:
     """ Store for save and restore clock state """
     def __init__(self, clock, filename="/root/clockstate.txt"):
@@ -19,7 +20,7 @@ class StateStore:
 
     def restore(self):
         """ Restores current state from file """
-        try:   
+        try:
             with open(self.filename, 'r') as f:
                 self.clock.setState(f.readline())
                 invstring = f.readline()
