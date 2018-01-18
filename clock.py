@@ -112,7 +112,7 @@ class Clock:
         return "Clock({}, {}, {}, {})".format(self.CLK, self.POL, self.state, self.inverse)
 
 
-if __name__ == "__main__":
+def test():
     clock = Clock(None, None)
     print clock
     clock.setState("13:23:4")
@@ -121,3 +121,7 @@ if __name__ == "__main__":
     print "Time to go: ", clock.timetogo(newstate)
     print "Time to wait: ", clock.timetowait(newstate)
     print repr(clock)
+
+
+if __name__ == "__main__":
+    test()
