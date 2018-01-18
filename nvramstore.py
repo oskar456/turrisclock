@@ -1,6 +1,7 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 
+from __future__ import print_function
 import sys
 import struct
 
@@ -30,7 +31,7 @@ class NVRAMStore:
                 self.clock.state = out[1]
                 return True
             else:
-                print "Clock state restore failed: invalid magic"
+                print("Clock state restore failed: invalid magic")
         except:
-            print "Clock state restore failed:", sys.exc_info()[1]
+            print("Clock state restore failed:", sys.exc_info()[1])
         return False

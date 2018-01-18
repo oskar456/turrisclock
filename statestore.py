@@ -1,6 +1,7 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 
+from __future__ import print_function
 import sys
 import re
 
@@ -9,7 +10,7 @@ class StateStore:
     def __init__(self, clock, filename="/root/clockstate.txt"):
         self.clock = clock
         self.filename = filename
-    
+
     def save(self):
         """ Saves current state to file """
         with open(self.filename, 'w') as f:
@@ -26,4 +27,4 @@ class StateStore:
                 if m:
                     self.clock.inverse = True
         except:
-            print "Clock state restore failed:", sys.exc_info()[1]
+            print("Clock state restore failed:", sys.exc_info()[1])

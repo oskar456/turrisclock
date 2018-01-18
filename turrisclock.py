@@ -1,14 +1,16 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
+
+from __future__ import print_function
+import signal
+import time
+import argparse
+import sys
 
 from gpio_turris import GPIO
 from clock import Clock
 from statestore import StateStore
 from nvramstore import NVRAMStore
-import signal
-import time
-import argparse
-import sys
 
 def killhandler(signum, frame):
     raise RuntimeError("Killed")
@@ -37,7 +39,7 @@ def clockinit(args):
     statestore.restore()
     nvramstore = NVRAMStore(clock)
     if args.require_nvram and not nvramstore.restore():
-        print "Cannot read clock state from the NVRAM. Exiting..."
+        print("Cannot read clock state from the NVRAM. Exiting...")
         sys.exit(1)
     if args.invert:
         clock.inverse = True

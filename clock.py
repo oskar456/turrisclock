@@ -1,6 +1,7 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # vim: expandtab shiftwidth=4 tabstop=8 softtabstop=4 smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 
+from __future__ import print_function
 import time
 import re
 
@@ -114,13 +115,13 @@ class Clock:
 
 def test():
     clock = Clock(None, None)
-    print clock
+    print(clock)
     clock.setState("13:23:4")
-    print clock.getState()
+    print(clock.getState())
     newstate = Clock.parsestate("12:43:04")
-    print "Time to go: ", clock.timetogo(newstate)
-    print "Time to wait: ", clock.timetowait(newstate)
-    print repr(clock)
+    print("Time to go: ", clock.timetogo(newstate))
+    print("Time to wait: ", clock.timetowait(newstate))
+    print(repr(clock))
 
 
 if __name__ == "__main__":
