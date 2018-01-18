@@ -8,7 +8,7 @@ import struct
 
 class NVRAMStore:
     """ Store for save and restore clock state """
-    MAGIC = "TRSCLK"
+    MAGIC = b"TRSCLK"
     fmt = struct.Struct("6sH")  # 6 byte magic plus one unsigned short
 
     def __init__(self, clock, filename="/sys/devices/platform/soc@ffe00000/"
