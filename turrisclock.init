@@ -1,0 +1,12 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2016 OpenWrt.org
+
+START=99
+USE_PROCD=1
+
+start_service()
+{
+	procd_open_instance
+	procd_set_param command "/opt/turrisclock/turrisclock.py" --require-nvram
+	procd_close_instance
+}
